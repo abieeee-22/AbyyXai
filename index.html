@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AbyyXai</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: radial-gradient(circle at top left, #0f0c29, #302b63, #24243e); color: #eef2f6; height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; will-change: transform; }
+        .app { width: 100%; max-width: 480px; height: 96vh; max-height: 900px; background: rgba(20, 26, 36, 0.6); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: 40px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255,255,255,0.06); border: 1px solid rgba(255, 255, 255, 0.06); position: relative; will-change: transform; }
+        
+        /* Header */
+        .header { padding: 20px 24px; background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(12px); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.04); flex-shrink: 0; will-change: transform; }
+        .header h2 { font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 10px; letter-spacing: -0.3px; color: #f0f4fa; }
+        .header h2 span { background: linear-gradient(135deg, #a18cd1, #7c3aed); padding: 2px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; color: white; letter-spacing: 0.5px; box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3); }
+        .header-right { display: flex; align-items: center; gap: 12px; }
+        .menu-btn { background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.06); color: #b0b8c8; font-size: 22px; cursor: pointer; padding: 8px 10px; border-radius: 14px; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); line-height: 1; will-change: transform; }
+        .menu-btn:hover { background: rgba(255, 255, 255, 0.12); color: #fff; transform: scale(1.05); box-shadow: 0 4px 20px rgba(124, 58, 237, 0.15); }
+        .poin-display { font-size: 14px; font-weight: 600; color: #a29bfe; background: rgba(162, 155, 254, 0.08); padding: 4px 14px; border-radius: 20px; border: 1px solid rgba(162, 155, 254, 0.1); backdrop-filter: blur(4px); }
+
+        /* Model Selector Custom CSS */
+        .model-wrapper { position: relative; display: flex; align-items: center; }
+        .model-select-custom { position: relative; display: inline-block; }
+        .model-select-custom select { appearance: none; -webkit-appearance: none; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.06); color: #d0d8e4; padding: 8px 36px 8px 16px; border-radius: 24px; font-size: 13px; font-weight: 500; cursor: pointer; outline: none; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); backdrop-filter: blur(4px); width: 140px; }
+        .model-select-custom select:focus { border-color: #7c3aed; box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.15); background: rgba(255, 255, 255, 0.06); }
+        .model-select-custom select option { background: #1a2332; color: #d0d8e4; }
+        .model-select-custom::after { content: '▾'; position: absolute; right: 14px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #8892a8; font-size: 10px; }
+
+        /* Chat Area */
+        .chat-area { flex: 1; overflow-y: auto; padding: 20px 20px 10px; display: flex; flex-direction: column; gap: 16px; scroll-behavior: smooth; background: rgba(0, 0, 0, 0.1); will-change: transform; }
+        .chat-area::-webkit-scrollbar { width: 4px; }
+        .chat-area::-webkit-scrollbar-track { background: transparent; }
+        .chat-area::-webkit-scrollbar-thumb { background: rgba(162, 155, 254, 0.3); border-radius: 10px; }
+        .chat-area::-webkit-scrollbar-thumb:hover { background: rgba(162, 155, 254, 0.5); }
+
+        /* Messages */
+        .message { max-width: 88%; padding: 16px 20px; border-radius: 20px; line-height: 1.6; font-size: 15px; animation: msgIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); word-wrap: break-word; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); position: relative; backdrop-filter: blur(4px); will-change: transform, opacity; }
+        @keyframes msgIn { 0% { opacity: 0; transform: translateY(20px) scale(0.95); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+        .message.user { align-self: flex-end; background: linear-gradient(135deg, #a18cd1, #7c3aed); color: white; border-bottom-right-radius: 4px; font-family: 'Inter', sans-serif; box-shadow: 0 4px 30px rgba(124, 58, 237, 0.25); }
+        .message.ai { align-self: flex-start; background: rgba(26, 35, 50, 0.7); border: 1px solid rgba(162, 155, 254, 0.15); border-left: 3px solid #a18cd1; font-family: 'Fira Code', 'Courier New', monospace; color: #e0e4f0; position: relative; backdrop-filter: blur(8px); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); }
+        .message.ai::before { content: '🤖 AI'; position: absolute; top: -10px; left: 16px; background: rgba(26, 35, 50, 0.9); padding: 0 10px; font-size: 11px; font-weight: 600; color: #a18cd1; font-family: 'Inter', sans-serif; letter-spacing: 0.5px; border-radius: 8px; backdrop-filter: blur(4px); }
+        .message.ai .reason { font-size: 13px; color: #8892b0; margin-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.04); padding-top: 10px; font-family: 'Inter', sans-serif; }
+        .message.ai .citations, .message.ai .sources { font-size: 12px; color: #6b7a9a; margin-top: 6px; font-family: 'Inter', sans-serif; }
+        .message.ai .citations a, .message.ai .sources a { color: #a18cd1; text-decoration: none; margin-right: 8px; }
+        .message.ai .citations a:hover, .message.ai .sources a:hover { text-decoration: underline; }
+
+        /* Code Block */
+        .code-block { background: rgba(13, 17, 23, 0.8); border: 1px solid rgba(42, 51, 72, 0.5); border-radius: 14px; padding: 16px 18px; margin-top: 12px; position: relative; font-family: 'Fira Code', monospace; font-size: 13px; color: #d0d8e4; overflow-x: auto; white-space: pre-wrap; word-break: break-word; backdrop-filter: blur(4px); }
+        .code-block .copy-btn { position: absolute; top: 10px; right: 12px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.06); color: #8892b0; padding: 4px 14px; border-radius: 10px; font-size: 11px; font-weight: 500; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); font-family: 'Inter', sans-serif; backdrop-filter: blur(4px); will-change: transform; }
+        .code-block .copy-btn:hover { background: rgba(255, 255, 255, 0.08); color: #fff; transform: scale(1.02); }
+        .code-block .copy-btn.copied { background: #2ecc71; color: white; border-color: #2ecc71; }
+
+        /* Loading */
+        .loading-wrapper { align-self: flex-start; max-width: 80%; background: rgba(26, 35, 50, 0.7); border-radius: 20px; padding: 16px 20px; border-bottom-left-radius: 4px; border: 1px solid rgba(162, 155, 254, 0.1); border-left: 3px solid #a18cd1; display: flex; flex-direction: column; gap: 10px; animation: msgIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); font-family: 'Fira Code', monospace; backdrop-filter: blur(8px); }
+        .loading-line { height: 10px; background: linear-gradient(90deg, rgba(42, 51, 72, 0.5) 25%, rgba(162, 155, 254, 0.3) 50%, rgba(42, 51, 72, 0.5) 75%); background-size: 200% 100%; border-radius: 8px; animation: shimmer 1.5s infinite; }
+        .loading-line.short { width: 55%; }
+        .loading-line.medium { width: 80%; }
+        .loading-dots { display: flex; gap: 8px; margin-top: 4px; }
+        .loading-dot { width: 8px; height: 8px; background: linear-gradient(135deg, #a18cd1, #7c3aed); border-radius: 50%; animation: dotBounce 1.2s infinite; }
+        .loading-dot:nth-child(2) { animation-delay: 0.2s; }
+        .loading-dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+        @keyframes dotBounce { 0%, 60%, 100% { transform: translateY(0); opacity: 0.4; } 30% { transform: translateY(-8px); opacity: 1; } }
+
+        /* Input Area */
+        .input-area { padding: 16px 20px 24px; border-top: 1px solid rgba(255, 255, 255, 0.04); display: flex; gap: 12px; background: rgba(20, 26, 36, 0.4); flex-shrink: 0; backdrop-filter: blur(12px); }
+        .input-area input { flex: 1; padding: 14px 20px; border-radius: 28px; border: 1px solid rgba(255, 255, 255, 0.06); background: rgba(255, 255, 255, 0.04); color: #f0f4fa; font-size: 15px; outline: none; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .input-area input:focus { border-color: #7c3aed; box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.1); background: rgba(255, 255, 255, 0.06); transform: scale(1.01); }
+        .input-area input::placeholder { color: #5a6a86; }
+        .input-area button { padding: 14px 24px; border-radius: 28px; border: none; background: linear-gradient(135deg, #a18cd1, #7c3aed); color: white; font-weight: 600; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); font-size: 16px; flex-shrink: 0; box-shadow: 0 4px 20px rgba(124, 58, 237, 0.2); will-change: transform; }
+        .input-area button:hover { transform: scale(1.04) translateY(-2px); box-shadow: 0 8px 30px rgba(124, 58, 237, 0.35); }
+        .input-area button:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        /* Sidebar */
+        .overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(6px); z-index: 1000; display: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .overlay.active { display: block; }
+        .sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 300px; background: rgba(20, 26, 36, 0.7); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); padding: 32px 24px; transform: translateX(-100%); transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); z-index: 1001; border-right: 1px solid rgba(255, 255, 255, 0.04); display: flex; flex-direction: column; will-change: transform; }
+        .sidebar.active { transform: translateX(0); }
+        .sidebar h3 { font-size: 22px; font-weight: 700; margin-bottom: 32px; color: #f0f4fa; display: flex; align-items: center; gap: 12px; letter-spacing: -0.3px; }
+        .sidebar-item { display: flex; align-items: center; gap: 16px; padding: 14px 18px; border-radius: 14px; color: #9aa8c0; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; margin-bottom: 4px; font-size: 15px; font-weight: 500; will-change: transform; }
+        .sidebar-item:hover { background: rgba(255, 255, 255, 0.06); color: #f0f4fa; transform: translateX(4px); }
+        .sidebar-item.active { background: rgba(124, 58, 237, 0.12); color: #a18cd1; border-left: 3px solid #a18cd1; }
+        .sidebar-item i { width: 24px; text-align: center; font-size: 18px; }
+        .close-btn { position: absolute; top: 20px; right: 20px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.06); color: #8892a8; font-size: 24px; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); padding: 8px 10px; border-radius: 14px; line-height: 1; backdrop-filter: blur(4px); will-change: transform; }
+        .close-btn:hover { color: white; background: rgba(255, 255, 255, 0.08); transform: rotate(90deg); }
+        .sidebar-footer { margin-top: auto; border-top: 1px solid rgba(255, 255, 255, 0.04); padding-top: 20px; font-size: 13px; color: #5a6a86; }
+
+        /* Modal */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px); z-index: 2000; display: none; justify-content: center; align-items: center; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .modal-overlay.active { display: flex; }
+        .modal-box { background: rgba(26, 35, 50, 0.8); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 32px; padding: 28px 32px; max-width: 480px; width: 90%; box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6); animation: modalIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); will-change: transform, opacity; }
+        @keyframes modalIn { from { opacity: 0; transform: scale(0.9) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        .modal-box h3 { font-size: 20px; font-weight: 700; color: #f0f4fa; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+        .modal-box p { font-size: 14px; color: #9aa8c0; margin-bottom: 16px; }
+        .modal-box input[type="text"], .modal-box input[type="file"] { width: 100%; padding: 12px 16px; border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.06); background: rgba(255, 255, 255, 0.04); color: #f0f4fa; font-size: 15px; outline: none; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); margin-bottom: 12px; }
+        .modal-box input[type="text"]:focus { border-color: #7c3aed; box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.1); }
+        .modal-box input[type="file"]::file-selector-button { background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.06); padding: 8px 16px; border-radius: 12px; color: #d0d8e4; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); font-weight: 500; backdrop-filter: blur(4px); will-change: transform; }
+        .modal-box input[type="file"]::file-selector-button:hover { background: rgba(255, 255, 255, 0.08); transform: scale(1.02); }
+        .modal-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 8px; }
+        .modal-actions button { padding: 10px 24px; border-radius: 16px; border: none; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); will-change: transform; }
+        .modal-actions .btn-primary { background: linear-gradient(135deg, #a18cd1, #7c3aed); color: white; box-shadow: 0 4px 15px rgba(124, 58, 237, 0.2); }
+        .modal-actions .btn-primary:hover { transform: scale(1.02) translateY(-2px); box-shadow: 0 8px 25px rgba(124, 58, 237, 0.3); }
+        .modal-actions .btn-secondary { background: rgba(255, 255, 255, 0.04); color: #b0b8c8; border: 1px solid rgba(255, 255, 255, 0.06); }
+        .modal-actions .btn-secondary:hover { background: rgba(255, 255, 255, 0.08); transform: scale(1.02); }
+        .modal-box .result-area { margin-top: 16px; padding: 14px; border-radius: 16px; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.04); max-height: 400px; overflow-y: auto; font-size: 14px; color: #d0d8e4; display: none; }
+        .modal-box .result-area.show { display: block; }
+        .modal-box .loading-spinner { display: none; text-align: center; padding: 20px 0; color: #8892b0; }
+        .modal-box .loading-spinner.active { display: block; }
+        .modal-box .loading-spinner .spinner { width: 30px; height: 30px; border: 3px solid rgba(255, 255, 255, 0.04); border-top: 3px solid #a18cd1; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 10px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .modal-box .result-area video, .modal-box .result-area img { max-width: 100%; border-radius: 12px; margin-top: 8px; border: 1px solid rgba(255, 255, 255, 0.04); }
+
+        /* Berita MetroTV */
+        .berita-item { padding: 12px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.04); }
+        .berita-item:last-child { border-bottom: none; }
+        .berita-item .title { font-weight: 600; color: #f0f4fa; font-size: 15px; margin-bottom: 4px; }
+        .berita-item .summary { font-size: 13px; color: #8892b0; margin-bottom: 4px; }
+        .berita-item .meta { font-size: 12px; color: #5a6a86; display: flex; gap: 12px; }
+        .berita-item .meta a { color: #a18cd1; text-decoration: none; }
+        .berita-item .meta a:hover { text-decoration: underline; }
+
+        /* Auth Overlay */
+        .auth-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(12px); z-index: 3000; display: flex; justify-content: center; align-items: center; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .auth-overlay.hidden { display: none; }
+        .auth-box { background: rgba(26, 35, 50, 0.8); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 32px; padding: 32px 28px; max-width: 420px; width: 90%; box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6); animation: modalIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .auth-box h3 { font-size: 22px; font-weight: 700; color: #f0f4fa; margin-bottom: 8px; }
+        .auth-box p { color: #9aa8c0; font-size: 14px; margin-bottom: 20px; }
+        .auth-box input { width: 100%; padding: 12px 16px; border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.06); background: rgba(255, 255, 255, 0.04); color: #f0f4fa; font-size: 15px; outline: none; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); margin-bottom: 12px; }
+        .auth-box input:focus { border-color: #7c3aed; box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.1); }
+        .auth-box .auth-btn { width: 100%; padding: 12px; border-radius: 16px; border: none; background: linear-gradient(135deg, #a18cd1, #7c3aed); color: white; font-weight: 600; font-size: 16px; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); margin-top: 4px; box-shadow: 0 4px 20px rgba(124, 58, 237, 0.2); will-change: transform; }
+        .auth-box .auth-btn:hover { transform: scale(1.02) translateY(-2px); box-shadow: 0 8px 30px rgba(124, 58, 237, 0.3); }
+        .auth-box .auth-switch { color: #8892b0; font-size: 14px; margin-top: 12px; text-align: center; cursor: pointer; transition: all 0.2s; }
+        .auth-box .auth-switch span { color: #a18cd1; font-weight: 600; }
+        .auth-box .auth-switch:hover { color: #f0f4fa; }
+        .auth-box .error-msg { color: #f87171; font-size: 13px; margin-top: 8px; display: none; }
+
+        /* Maintenance Overlay */
+        .maintenance-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(16px); z-index: 9999; display: none; justify-content: center; align-items: center; }
+        .maintenance-overlay.active { display: flex; }
+        .maintenance-box { background: rgba(26, 35, 50, 0.9); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 32px; padding: 40px 32px; max-width: 420px; width: 90%; box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6); text-align: center; animation: modalIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .maintenance-box h2 { font-size: 28px; font-weight: 700; color: #f0f4fa; margin-bottom: 12px; }
+        .maintenance-box p { color: #9aa8c0; font-size: 15px; margin-bottom: 20px; line-height: 1.6; }
+        .maintenance-box .countdown { font-size: 48px; font-weight: 800; color: #a18cd1; margin: 16px 0; }
+        .maintenance-box .small { font-size: 13px; color: #5a6a86; }
+
+        /* Toast */
+        .toast-notification { position: fixed; top: 24px; right: 24px; background: rgba(26, 35, 50, 0.8); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.06); padding: 18px 24px; border-radius: 16px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4); color: #f0f4fa; font-size: 14px; z-index: 9999; animation: slideDown 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); max-width: 360px; }
+        .toast-notification .title { font-weight: 600; color: #a18cd1; margin-bottom: 4px; }
+        .toast-notification .desc { color: #b0b8c8; font-size: 13px; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+        @media (max-width: 500px) {
+            .app { height: 100vh; max-height: none; border-radius: 0; }
+            .sidebar { width: 280px; }
+            .header h2 { font-size: 17px; }
+            .model-select-custom select { width: 120px; font-size: 12px; padding: 6px 30px 6px 12px; }
+            .modal-box { padding: 20px; }
+            .toast-notification { top: 16px; right: 16px; left: 16px; max-width: none; }
+            .maintenance-box { padding: 24px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Maintenance Overlay -->
+    <div class="maintenance-overlay" id="maintenanceOverlay">
+        <div class="maintenance-box">
+            <h2>🔧 Maintenance</h2>
+            <p id="maintenanceMessage">AbyyXai sedang dalam perbaikan. Kami akan kembali segera!</p>
+            <div class="countdown" id="maintenanceCountdown">--</div>
+            <div class="small">Mohon tunggu, tim kami sedang bekerja.</div>
+        </div>
+    </div>
+
+    <!-- Auth Overlay -->
+    <div class="auth-overlay" id="authOverlay">
+        <div class="auth-box" id="authBox">
+            <h3 id="authTitle">Login</h3>
+            <p id="authDesc">Masuk untuk menggunakan AbyyXai.</p>
+            <input type="username" id="authEmail" placeholder="username">
+            <input type="password" id="authPassword" placeholder="Password">
+            <div class="error-msg" id="authError"></div>
+            <button class="auth-btn" id="authBtn" onclick="handleAuth()">Login</button>
+            <div class="auth-switch" id="authSwitch" onclick="toggleAuthMode()">Belum punya akun? <span>Register</span></div>
+        </div>
+    </div>
+
+    <!-- App -->
+    <div class="app">
+        <div class="header">
+            <h2>✦ <span>AbyyXai</span></h2>
+            <div class="header-right">
+                <span class="poin-display" id="poinDisplay">💎 0</span>
+                <div class="model-wrapper">
+                    <div class="model-select-custom">
+                        <select id="modelSelect">
+                            <option value="Claude">Claude</option>
+                            <option value="Heck">Heck</option>
+                            <option value="Groq">Groq</option>
+                            <option value="Copilot">Copilot</option>
+                            <option value="Uncensored">Uncensored</option>
+                            <option value="Google">Google</option>
+                            <option value="NoteGpt">NoteGpt</option>
+                            <option value="Xdash">Xdash</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="menu-btn" onclick="toggleMenu()">☰</button>
+            </div>
+        </div>
+
+        <div class="chat-area" id="chatArea">
+            <div class="message ai">👋 Selamat datang di <b>AbyyXai</b>!<br>Login/register dulu untuk mulai.</div>
+        </div>
+
+        <div class="input-area">
+            <input type="text" id="userInput" placeholder="Tulis pesan..." onkeydown="if(event.key==='Enter') sendMessage()">
+            <button id="sendBtn" onclick="sendMessage()">➤</button>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+    <div class="sidebar" id="sidebar">
+        <button class="close-btn" onclick="toggleMenu()">✕</button>
+        <h3>☰ AbyyXai</h3>
+        <div class="sidebar-item" onclick="openModal('beranda')"><i>🏠</i> Beranda</div>
+        <div class="sidebar-item" onclick="openModal('riwayat')"><i>💬</i> Riwayat</div>
+        <div class="sidebar-item" onclick="openModal('pengaturan')"><i>⚙️</i> Pengaturan</div>
+        <div class="sidebar-item" onclick="openModal('dokumentasi')"><i>📖</i> Dokumentasi</div>
+        <div class="sidebar-item" onclick="openModal('cuaca')"><i>🌤️</i> Cuaca</div>
+        <div class="sidebar-item" onclick="openModal('jadwalbola')"><i>⚽</i> Jadwal Bola</div>
+        <div class="sidebar-item" onclick="openModal('hdimage')"><i>🖼️</i> HD Image</div>
+        <div class="sidebar-item" onclick="openModal('text2vid')"><i>🎬</i> Text to Video</div>
+        <div class="sidebar-item" onclick="openModal('cekgempa')"><i>🌍</i> Cek Gempa</div>
+        <div class="sidebar-item" onclick="openModal('tebakgambar')"><i>🖼️</i> Tebak Gambar</div>
+        <div class="sidebar-item" onclick="openModal('beritametrotv')"><i>📰</i> Berita MetroTV</div>
+        <div class="sidebar-item" onclick="openModal('changelog')"><i>📋</i> Changelog</div>
+        <div class="sidebar-item" onclick="openModal('tentang')"><i>ℹ️</i> Tentang</div>
+        <div class="sidebar-footer">
+            <p>AbyyXai v4.0</p>
+            <p>Status: 🟢 Online</p>
+        </div>
+    </div>
+
+    <!-- Modal Popup -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-box" id="modalBox">
+            <h3 id="modalTitle">🌤️ Cuaca</h3>
+            <p id="modalDesc">Masukkan nama kota untuk melihat cuaca terkini.</p>
+            <div id="modalInputArea"></div>
+            <div class="loading-spinner" id="modalSpinner"><div class="spinner"></div><span>Memproses...</span></div>
+            <div class="result-area" id="modalResult"></div>
+            <div class="modal-actions">
+                <button class="btn-secondary" onclick="closeModal()">Tutup</button>
+                <button class="btn-primary" id="modalProcessBtn" onclick="processModal()">Proses</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+    <script>
+        // ============================================================
+        //  FIREBASE CONFIG
+        // ============================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyAr9W4sxpLZYvlm545GWO0MNcQmr67cdRc",
+            authDomain: "abyyyxrat-firebase.firebaseapp.com",
+            projectId: "abyyyxrat-firebase",
+            storageBucket: "abyyyxrat-firebase.firebasestorage.app",
+            messagingSenderId: "194291275709",
+            appId: "1:194291275709:web:92f1aae3884d834ceea4d4",
+            measurementId: "G-EPH4LVWKKC",
+            databaseURL: "https://abyyyxrat-firebase-default-rtdb.asia-southeast1.firebasedatabase.app"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // ============================================================
+        //  STATE
+        // ============================================================
+        let currentUser = null;
+        let userData = null;
+        let isWaiting = false;
+        let currentTool = null;
+        let tebakGambarAnswer = '';
+        let banListener = null;
+
+        const chatArea = document.getElementById('chatArea');
+        const userInput = document.getElementById('userInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const modelSelect = document.getElementById('modelSelect');
+        const poinDisplay = document.getElementById('poinDisplay');
+
+        const authOverlay = document.getElementById('authOverlay');
+        const authTitle = document.getElementById('authTitle');
+        const authDesc = document.getElementById('authDesc');
+        const authEmail = document.getElementById('authEmail');
+        const authPassword = document.getElementById('authPassword');
+        const authBtn = document.getElementById('authBtn');
+        const authSwitch = document.getElementById('authSwitch');
+        const authError = document.getElementById('authError');
+        let isRegister = false;
+
+        const modalOverlay = document.getElementById('modalOverlay');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalDesc = document.getElementById('modalDesc');
+        const modalInputArea = document.getElementById('modalInputArea');
+        const modalResult = document.getElementById('modalResult');
+        const modalSpinner = document.getElementById('modalSpinner');
+        const modalProcessBtn = document.getElementById('modalProcessBtn');
+
+        const maintenanceOverlay = document.getElementById('maintenanceOverlay');
+        const maintenanceMessage = document.getElementById('maintenanceMessage');
+        const maintenanceCountdown = document.getElementById('maintenanceCountdown');
+
+        // ============================================================
+        //  MAINTENANCE SYSTEM (Pop-up full screen)
+        // ============================================================
+        function listenMaintenance() {
+            db.ref('maintenance').on('value', (snap) => {
+                const data = snap.val();
+                if (data && data.active) {
+                    maintenanceOverlay.classList.add('active');
+                    maintenanceMessage.textContent = data.message || 'AbyyXai sedang dalam perbaikan. Kami akan kembali segera!';
+                    // Countdown sederhana (misal 10 detik)
+                    let count = 10;
+                    maintenanceCountdown.textContent = count + 's';
+                    const interval = setInterval(() => {
+                        count--;
+                        if (count <= 0) {
+                            maintenanceCountdown.textContent = '--';
+                            clearInterval(interval);
+                        } else {
+                            maintenanceCountdown.textContent = count + 's';
+                        }
+                    }, 1000);
+                } else {
+                    maintenanceOverlay.classList.remove('active');
+                }
+            });
+        }
+
+        // ============================================================
+        //  AUTH SYSTEM
+        // ============================================================
+        function toggleAuthMode() {
+            isRegister = !isRegister;
+            authTitle.textContent = isRegister ? 'Register' : 'Login';
+            authDesc.textContent = isRegister ? 'Buat akun baru untuk menggunakan AbyyXai.' : 'Masuk untuk menggunakan AbyyXai.';
+            authBtn.textContent = isRegister ? 'Register' : 'Login';
+            authSwitch.innerHTML = isRegister ? 'Sudah punya akun? <span>Login</span>' : 'Belum punya akun? <span>Register</span>';
+            authError.style.display = 'none';
+            authError.textContent = '';
+        }
+
+        async function handleAuth() {
+            const email = authEmail.value.trim();
+            const password = authPassword.value.trim();
+            if (!email || !password) {
+                authError.textContent = 'Email dan password wajib diisi!';
+                authError.style.display = 'block';
+                return;
+            }
+            authError.style.display = 'none';
+            authBtn.disabled = true;
+            authBtn.textContent = 'Memproses...';
+
+            try {
+                const usersSnap = await db.ref('users').once('value');
+                const users = usersSnap.val() || {};
+
+                if (isRegister) {
+                    for (const uid in users) {
+                        if (users[uid].email === email) {
+                            throw new Error('Email sudah terdaftar!');
+                        }
+                    }
+                    const newUid = Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+                    await db.ref(`users/${newUid}`).set({
+                        email: email,
+                        password: password,
+                        poin: 100,
+                        banned: false,
+                        ip: 'unknown',
+                        createdAt: new Date().toISOString()
+                    });
+                    currentUser = { uid: newUid, email: email };
+                    localStorage.setItem('abyyxai_uid', newUid);
+                    localStorage.setItem('abyyxai_email', email);
+                    authOverlay.classList.add('hidden');
+                    await loadUserData();
+                    listenMaintenance();
+                    listenBroadcast();
+                    listenPoin();
+                    listenBan();
+                    addMessage('✅ Akun berhasil dibuat! Selamat datang.', 'ai');
+                } else {
+                    let foundUid = null;
+                    for (const uid in users) {
+                        if (users[uid].email === email && users[uid].password === password) {
+                            foundUid = uid;
+                            break;
+                        }
+                    }
+                    if (!foundUid) {
+                        throw new Error('Email atau password salah!');
+                    }
+                    if (users[foundUid].banned) {
+                        throw new Error('Akun Anda telah dibanned!');
+                    }
+                    currentUser = { uid: foundUid, email: email };
+                    localStorage.setItem('abyyxai_uid', foundUid);
+                    localStorage.setItem('abyyxai_email', email);
+                    authOverlay.classList.add('hidden');
+                    await loadUserData();
+                    listenMaintenance();
+                    listenBroadcast();
+                    listenPoin();
+                    listenBan();
+                    addMessage('✅ Login berhasil! Selamat datang kembali.', 'ai');
+                }
+            } catch (error) {
+                authError.textContent = error.message;
+                authError.style.display = 'block';
+            } finally {
+                authBtn.disabled = false;
+                authBtn.textContent = isRegister ? 'Register' : 'Login';
+            }
+        }
+
+        (async function autoLogin() {
+            const uid = localStorage.getItem('abyyxai_uid');
+            const email = localStorage.getItem('abyyxai_email');
+            if (uid && email) {
+                try {
+                    const snap = await db.ref(`users/${uid}`).once('value');
+                    if (snap.exists()) {
+                        const data = snap.val();
+                        if (!data.banned) {
+                            currentUser = { uid, email };
+                            authOverlay.classList.add('hidden');
+                            userData = data;
+                            updatePoinDisplay();
+                            listenMaintenance();
+                            listenBroadcast();
+                            listenPoin();
+                            listenBan();
+                            addMessage('👋 Selamat datang kembali!', 'ai');
+                            return;
+                        } else {
+                            localStorage.removeItem('abyyxai_uid');
+                            localStorage.removeItem('abyyxai_email');
+                        }
+                    } else {
+                        localStorage.removeItem('abyyxai_uid');
+                        localStorage.removeItem('abyyxai_email');
+                    }
+                } catch (e) {
+                    localStorage.removeItem('abyyxai_uid');
+                    localStorage.removeItem('abyyxai_email');
+                }
+            }
+        })();
+
+        // ============================================================
+        //  USER DATA & POIN
+        // ============================================================
+        async function loadUserData() {
+            if (!currentUser) return;
+            const snap = await db.ref(`users/${currentUser.uid}`).once('value');
+            if (snap.exists()) {
+                userData = snap.val();
+                if (userData.banned) {
+                    alert('Akun Anda telah dibanned!');
+                    logout();
+                    return;
+                }
+                updatePoinDisplay();
+            }
+        }
+
+        function listenPoin() {
+            if (!currentUser) return;
+            db.ref(`users/${currentUser.uid}/poin`).on('value', (snap) => {
+                if (snap.exists()) {
+                    userData.poin = snap.val();
+                    updatePoinDisplay();
+                }
+            });
+        }
+
+        function updatePoinDisplay() {
+            poinDisplay.textContent = `💎 ${userData?.poin || 0}`;
+        }
+
+        async function deductPoin(amount) {
+            if (!currentUser || !userData) return false;
+            if (userData.poin < amount) {
+                showToast('💎 Poin Tidak Cukup', `Anda butuh ${amount} poin. Poin Anda: ${userData.poin}`);
+                return false;
+            }
+            const newPoin = userData.poin - amount;
+            await db.ref(`users/${currentUser.uid}/poin`).set(newPoin);
+            userData.poin = newPoin;
+            updatePoinDisplay();
+            return true;
+        }
+
+        async function addPoin(amount) {
+            if (!currentUser || !userData) return;
+            const newPoin = userData.poin + amount;
+            await db.ref(`users/${currentUser.uid}/poin`).set(newPoin);
+            userData.poin = newPoin;
+            updatePoinDisplay();
+        }
+
+        // ============================================================
+        //  BAN REAL-TIME
+        // ============================================================
+        function listenBan() {
+            if (!currentUser) return;
+            if (banListener) {
+                db.ref(`users/${currentUser.uid}/banned`).off('value', banListener);
+            }
+            banListener = db.ref(`users/${currentUser.uid}/banned`).on('value', (snap) => {
+                if (snap.exists() && snap.val() === true) {
+                    alert('🚫 Anda telah dibanned oleh admin!');
+                    logout();
+                }
+            });
+        }
+
+        // ============================================================
+        //  BROADCAST
+        // ============================================================
+        function listenBroadcast() {
+            db.ref('broadcast').on('value', (snap) => {
+                const data = snap.val();
+                if (data && data.message) {
+                    addMessage('📢 ' + data.message, 'ai');
+                }
+            });
+        }
+
+        // ============================================================
+        //  TOAST NOTIFICATION
+        // ============================================================
+        function showToast(title, desc) {
+            const existing = document.querySelector('.toast-notification');
+            if (existing) existing.remove();
+
+            const el = document.createElement('div');
+            el.className = 'toast-notification';
+            el.innerHTML = `
+                <div class="title">${title}</div>
+                <div class="desc">${desc}</div>
+            `;
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 4000);
+        }
+
+        // ============================================================
+        //  ADD MESSAGE
+        // ============================================================
+        function addMessage(text, sender = 'ai', extra = null) {
+            const div = document.createElement('div');
+            if (sender === 'user') {
+                div.className = 'message user';
+                div.textContent = text;
+            } else {
+                div.className = 'message ai';
+                let html = '';
+                const regex = /```([\s\S]*?)```/g;
+                let match;
+                let lastIndex = 0;
+                let parts = [];
+                while ((match = regex.exec(text)) !== null) {
+                    parts.push(text.substring(lastIndex, match.index));
+                    parts.push({
+                        type: 'code',
+                        content: match[1].trim()
+                    });
+                    lastIndex = match.index + match[0].length;
+                }
+                if (lastIndex < text.length) {
+                    parts.push(text.substring(lastIndex));
+                }
+                parts.forEach(part => {
+                    if (typeof part === 'string') {
+                        html += part;
+                    } else if (part.type === 'code') {
+                        html += `
+                            <div class="code-block">
+                                <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+                                <pre>${escapeHtml(part.content)}</pre>
+                            </div>
+                        `;
+                    }
+                });
+                if (extra) {
+                    if (extra.reason) html += `<div class="reason">🧠 ${extra.reason}</div>`;
+                    if (extra.citations && extra.citations.length) {
+                        const links = extra.citations.map(c => `<a href="${c}" target="_blank">🔗</a>`).join(' ');
+                        html += `<div class="citations">📚 ${links}</div>`;
+                    }
+                    if (extra.sources && extra.sources.length) {
+                        const links = extra.sources.map(s => `<a href="${s}" target="_blank">📄</a>`).join(' ');
+                        html += `<div class="sources">📎 ${links}</div>`;
+                    }
+                }
+                div.innerHTML = html;
+            }
+            chatArea.appendChild(div);
+            chatArea.scrollTop = chatArea.scrollHeight;
+
+            if (currentUser) {
+                db.ref(`chats/${currentUser.uid}`).push({
+                    sender: sender,
+                    text: text,
+                    timestamp: Date.now()
+                });
+            }
+        }
+
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+        }
+
+        function copyCode(btn) {
+            const pre = btn.nextElementSibling;
+            const code = pre.textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                btn.textContent = '✅ Copied!';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = '📋 Copy';
+                    btn.classList.remove('copied');
+                }, 2000);
+            }).catch(() => {
+                const textarea = document.createElement('textarea');
+                textarea.value = code;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                btn.textContent = '✅ Copied!';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = '📋 Copy';
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
+        }
+
+        function showLoading() {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'loading-wrapper';
+            wrapper.id = 'loadingIndicator';
+            wrapper.innerHTML = `
+                <div class="loading-line"></div>
+                <div class="loading-line medium"></div>
+                <div class="loading-line short"></div>
+                <div class="loading-dots">
+                    <div class="loading-dot"></div>
+                    <div class="loading-dot"></div>
+                    <div class="loading-dot"></div>
+                </div>
+            `;
+            chatArea.appendChild(wrapper);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        function removeLoading() {
+            const el = document.getElementById('loadingIndicator');
+            if (el) el.remove();
+        }
+
+        // ============================================================
+        //  MODAL SYSTEM
+        // ============================================================
+        function openModal(tool) {
+            if (!currentUser) {
+                alert('Silakan login/register dulu!');
+                return;
+            }
+            currentTool = tool;
+            modalResult.className = 'result-area';
+            modalResult.innerHTML = '';
+            modalSpinner.className = 'loading-spinner';
+            modalProcessBtn.style.display = 'inline-block';
+            modalProcessBtn.textContent = 'Proses';
+            modalProcessBtn.disabled = false;
+
+            if (tool === 'beranda') {
+                modalTitle.innerHTML = '🏠 Beranda';
+                modalDesc.textContent = 'Selamat datang di AbyyXai!';
+                modalInputArea.innerHTML = `
+                    <p style="color:#b0b8c8;font-size:15px;line-height:1.6;">
+                        🧠 Pilih model AI di header untuk chatting.<br>
+                        🛠️ Gunakan menu sidebar untuk tools.<br>
+                        📋 Lihat changelog untuk update terbaru.
+                    </p>
+                `;
+                modalProcessBtn.style.display = 'none';
+            } else if (tool === 'riwayat') {
+                modalTitle.innerHTML = '💬 Riwayat';
+                modalDesc.textContent = 'Riwayat chat tersimpan di database.';
+                modalInputArea.innerHTML = `
+                    <p style="color:#8892b0;font-size:15px;">Fitur ini masih dalam pengembangan untuk ditampilkan.</p>
+                `;
+                modalProcessBtn.style.display = 'none';
+            } else if (tool === 'pengaturan') {
+                modalTitle.innerHTML = '⚙️ Pengaturan';
+                modalDesc.textContent = 'Pengaturan aplikasi.';
+                modalInputArea.innerHTML = `
+                    <p style="color:#8892b0;font-size:15px;">Dark/Light mode: <span class="theme-toggle" onclick="toggleTheme()">🌙</span></p>
+                `;
+                modalProcessBtn.style.display = 'none';
+            } else if (tool === 'dokumentasi') {
+                modalTitle.innerHTML = '📖 Dokumentasi';
+                modalDesc.textContent = 'Dokumentasi API AbyyXai.';
+                modalInputArea.innerHTML = `
+                    <p style="color:#b0b8c8;font-size:15px;">
+                        📄 Dokumentasi API dapat diakses di:<br>
+                        <a href="------" target="_blank" style="color:#a18cd1;">klik di sini</a>
+                    </p>
+                `;
+                modalProcessBtn.style.display = 'none';
+            } else if (tool === 'changelog') {
+                modalTitle.innerHTML = '📋 Changelog';
+                modalDesc.textContent = 'Update terbaru AbyyXai.';
+                modalInputArea.innerHTML = `
+                    <div style="color:#b0b8c8;font-size:14px;line-height:1.8;">
+                        <b>🔹 v4.0 – 26 Juni 2026</b><br>
+                        • Fix lag (optimasi animasi)<br>
+                        • Maintenance pop-up full screen<br>
+                        • Model AI: Google, NoteGpt, Xdash<br>
+                        • Fitur baru: Berita MetroTV<br>
+                        • UI Glassmorphism & Animasi Smooth<br>
+                        • Admin panel: log aktivitas, reset poin, notifikasi
+                    </div>
+                `;
+                modalProcessBtn.style.display = 'none';
+            } else if (tool === 'tentang') {
+                modalTitle.innerHTML = 'ℹ️ Tentang';
+                modalDesc.textContent = 'Informasi AbyyXai.';
+                modalInputArea.innerHTML = `
+                    <div style="color:#b0b8c8;font-size:14px;line-height:1.8;">
+                        <b>AbyyXai</b> v4.0<br>
+                        Developer: Abyy (bekerja sama dengan pihak rahasia 🤫)<br><br>
+                        <b>Fitur:</b><br>
+                        🧠 AI Models: Claude, Heck, Groq, Copilot, Uncensored, Google, NoteGpt, Xdash<br>
+                        🌤️ Cuaca, ⚽ Jadwal Bola, 🖼️ HD Image, 🎬 Text to Video, 🌍 Cek Gempa, 🖼️ Tebak Gambar, 📰 Berita MetroTV
+                    </div>
+                `;
+                modalProcessBtn.style.display = 'none';
+            } else if (tool === 'cuaca') {
+                modalTitle.innerHTML = '🌤️ Cuaca';
+                modalDesc.textContent = 'Masukkan nama kota (biaya 5 poin).';
+                modalInputArea.innerHTML = `<input type="text" id="modalCityInput" placeholder="Contoh: Jakarta, Bandung, Tokyo">`;
+            } else if (tool === 'jadwalbola') {
+                modalTitle.innerHTML = '⚽ Jadwal Bola';
+                modalDesc.textContent = 'Lihat jadwal pertandingan (biaya 5 poin).';
+                modalInputArea.innerHTML = `<p style="color:#8892b0;font-size:14px;">Klik Proses untuk melihat jadwal.</p>`;
+            } else if (tool === 'hdimage') {
+                modalTitle.innerHTML = '🖼️ HD Image';
+                modalDesc.textContent = 'Upscale gambar ke HD (biaya 5 poin).';
+                modalInputArea.innerHTML = `<input type="file" id="modalFileInput" accept="image/*">`;
+            } else if (tool === 'text2vid') {
+                modalTitle.innerHTML = '🎬 Text to Video';
+                modalDesc.textContent = 'Buat video dari prompt (biaya 5 poin).';
+                modalInputArea.innerHTML = `<input type="text" id="modalPromptInput" placeholder="Contoh: Kucing pake baju lagi naik motor">`;
+            } else if (tool === 'cekgempa') {
+                modalTitle.innerHTML = '🌍 Cek Gempa';
+                modalDesc.textContent = 'Informasi gempa terkini (biaya 5 poin).';
+                modalInputArea.innerHTML = `<p style="color:#8892b0;font-size:14px;">Klik Proses untuk melihat info gempa.</p>`;
+            } else if (tool === 'tebakgambar') {
+                modalTitle.innerHTML = '🖼️ Tebak Gambar';
+                modalDesc.textContent = 'Teka-teki gambar (+5 poin jika benar, biaya 0 poin).';
+                modalInputArea.innerHTML = `
+                    <p style="color:#8892b0;font-size:14px;">Klik Proses untuk mendapatkan gambar.</p>
+                    <div id="tebakInputArea" style="display:none;margin-top:8px;">
+                        <input type="text" id="tebakJawaban" placeholder="Masukkan jawabanmu...">
+                        <button class="btn-primary" onclick="checkTebakGambar()" style="margin-top:8px;">Cek Jawaban</button>
+                    </div>
+                `;
+            } else if (tool === 'beritametrotv') {
+                modalTitle.innerHTML = '📰 Berita MetroTV';
+                modalDesc.textContent = 'Berita terbaru dari MetroTV.';
+                modalInputArea.innerHTML = `
+                    <p style="color:#8892b0;font-size:14px;">Klik Proses untuk melihat berita terbaru.</p>
+                `;
+            }
+
+            modalOverlay.classList.add('active');
+            const textInput = document.getElementById('modalCityInput') || document.getElementById('modalPromptInput');
+            if (textInput) textInput.focus();
+        }
+
+        function closeModal() {
+            modalOverlay.classList.remove('active');
+            currentTool = null;
+        }
+
+        async function processModal() {
+            if (!currentTool) return;
+            if (currentTool !== 'tebakgambar' && currentTool !== 'beritametrotv') {
+                const ok = await deductPoin(5);
+                if (!ok) return;
+            }
+
+            modalResult.className = 'result-area';
+            modalResult.innerHTML = '';
+            modalSpinner.className = 'loading-spinner active';
+            modalProcessBtn.disabled = true;
+            modalProcessBtn.textContent = 'Memproses...';
+
+            try {
+                if (currentTool === 'cuaca') {
+                    const city = document.getElementById('modalCityInput').value.trim();
+                    if (!city) {
+                        alert('Masukkan nama kota!');
+                        modalSpinner.className = 'loading-spinner';
+                        modalProcessBtn.disabled = false;
+                        modalProcessBtn.textContent = 'Proses';
+                        return;
+                    }
+                    const res = await fetch(`https://api.blckrose.my.id/tools/weather?city=${encodeURIComponent(city)}&apikey=oeaqE`);
+                    const data = await res.json();
+                    if (data.status === true && data.result) {
+                        displayWeatherResult(data.result);
+                    } else {
+                        modalResult.innerHTML = '<p style="color:#f87171;">❌ Kota tidak ditemukan.</p>';
+                        modalResult.className = 'result-area show';
+                    }
+                } else if (currentTool === 'jadwalbola') {
+                    const res = await fetch('https://api.blckrose.my.id/info/jadwalbola?apikey=oeaqE');
+                    const data = await res.json();
+                    if (data.status === true) {
+                        displayMatchResult(data);
+                    } else {
+                        modalResult.innerHTML = '<p style="color:#f87171;">❌ Gagal mengambil jadwal.</p>';
+                        modalResult.className = 'result-area show';
+                    }
+                } else if (currentTool === 'hdimage') {
+                    const fileInput = document.getElementById('modalFileInput');
+                    const file = fileInput.files[0];
+                    if (!file) {
+                        alert('Pilih file gambar!');
+                        modalSpinner.className = 'loading-spinner';
+                        modalProcessBtn.disabled = false;
+                        modalProcessBtn.textContent = 'Proses';
+                        return;
+                    }
+                    const formData = new FormData();
+                    formData.append('image', file);
+                    formData.append('scale', '2');
+                    formData.append('apikey', 'oeaqE');
+                    const res = await fetch('https://api.blckrose.my.id/tools/hd', { method: 'POST', body: formData });
+                    const data = await res.json();
+                    if (data.status === true) {
+                        modalResult.innerHTML = `<p style="color:#4ade80;">✅ HD Image berhasil!</p><p style="color:#d0d8e4;font-size:14px;margin-top:8px;">Hasil: ${JSON.stringify(data.result)}</p>`;
+                        modalResult.className = 'result-area show';
+                    } else {
+                        modalResult.innerHTML = '<p style="color:#f87171;">❌ Gagal memproses gambar.</p>';
+                        modalResult.className = 'result-area show';
+                    }
+                } else if (currentTool === 'text2vid') {
+                    const prompt = document.getElementById('modalPromptInput').value.trim();
+                    if (!prompt) {
+                        alert('Masukkan prompt!');
+                        modalSpinner.className = 'loading-spinner';
+                        modalProcessBtn.disabled = false;
+                        modalProcessBtn.textContent = 'Proses';
+                        return;
+                    }
+                    const res = await fetch(`https://api.blckrose.my.id/ai/text2vid?prompt=${encodeURIComponent(prompt)}&apikey=oeaqE`);
+                    const data = await res.json();
+                    if (data.status === true && data.result && data.result.video_url) {
+                        modalResult.innerHTML = `
+                            <p style="color:#4ade80;">✅ Video berhasil dibuat!</p>
+                            <p style="color:#8892b0;font-size:13px;">Prompt: "${data.result.prompt}"</p>
+                            <video controls autoplay loop muted><source src="${data.result.video_url}" type="video/mp4"></video>
+                            <p style="font-size:12px;color:#5a6a86;margin-top:6px;">🔗 <a href="${data.result.video_url}" target="_blank" style="color:#a18cd1;">Download</a></p>
+                        `;
+                        modalResult.className = 'result-area show';
+                    } else {
+                        modalResult.innerHTML = '<p style="color:#f87171;">❌ Gagal membuat video.</p>';
+                        modalResult.className = 'result-area show';
+                    }
+                } else if (currentTool === 'cekgempa') {
+                    const res = await fetch('https://api.blckrose.my.id/info/cekgempa?apikey=oeaqE');
+                    const data = await res.json();
+                    if (data.status === true && data.result) {
+                        const r = data.result;
+                        modalResult.innerHTML = `
+                            <div style="background:rgba(255,255,255,0.03);border-radius:14px;padding:14px 16px;">
+                                <div style="font-size:18px;font-weight:600;color:#f0f4fa;">🌍 ${r.lokasi}</div>
+                                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;margin-top:12px;font-size:14px;color:#9aa8c0;">
+                                    <span>⏰ Waktu <b>${r.waktu}</b></span>
+                                    <span>📊 Magnitudo <b>${r.magnitude}</b></span>
+                                    <span>📏 Kedalaman <b>${r.kedalaman}</b></span>
+                                    <span>📍 Koordinat <b>${r.koordinat}</b></span>
+                                    <span>⚠️ Potensi <b>${r.potensi}</b></span>
+                                    <span>📢 Dirasakan <b>${r.dirasakan}</b></span>
+                                </div>
+                                ${r.peta ? `<img src="${r.peta}" style="max-width:100%;border-radius:12px;margin-top:12px;">` : ''}
+                            </div>
+                        `;
+                        modalResult.className = 'result-area show';
+                    } else {
+                        modalResult.innerHTML = '<p style="color:#f87171;">❌ Gagal mengambil data gempa.</p>';
+                        modalResult.className = 'result-area show';
+                    }
+                } else if (currentTool === 'tebakgambar') {
+                    const res = await fetch('https://api.blckrose.my.id/game/tebakgambar');
+                    const data = await res.json();
+                    if (data.status === true && data.result) {
+                        const r = data.result;
+                        tebakGambarAnswer = r.jawaban;
+                        modalResult.innerHTML = `
+                            <div style="background:rgba(255,255,255,0.03);border-radius:14px;padding:14px 16px;">
+                                <div style="font-weight:600;color:#f0f4fa;font-size:16px;margin-bottom:8px;">🖼️ Level ${r.index}</div>
+                                <img src="${r.img}" style="max-width:100%;border-radius:12px;">
+                                <div style="margin-top:12px;color:#9aa8c0;font-size:14px;">
+                                    <span style="color:#a18cd1;font-weight:600;">Jawaban:</span> <span style="color:#d0d8e4;">${r.jawaban}</span>
+                                </div>
+                                <div style="margin-top:6px;color:#8892b0;font-size:13px;">📝 ${r.deskripsi}</div>
+                            </div>
+                        `;
+                        modalResult.className = 'result-area show';
+                        document.getElementById('tebakInputArea').style.display = 'block';
+                    } else {
+                        modalResult.innerHTML = '<p style="color:#f87171;">❌ Gagal mengambil tebak gambar.</p>';
+                        modalResult.className = 'result-area show';
+                    }
+                } else if (currentTool === 'beritametrotv') {
+                    const res = await fetch('https://api.blckrose.my.id/berita/metrotv?apikey=oeaqE');
+                    const data = await res.json();
+                    if (data.status === true && data.items) {
+                        let html = `<div style="background:rgba(255,255,255,0.03);border-radius:14px;padding:12px 16px;">`;
+                        data.items.slice(0, 10).forEach(item => {
+                            html += `
+                                <div class="berita-item">
+                                    <div class="title">${item.title}</div>
+                                    <div class="summary">${item.summary || 'Tidak ada ringkasan.'}</div>
+                                    <div class="meta">
+                                        <span>🕐 ${item.published_at || 'Tanggal tidak tersedia'}</span>
+                                        <a href="${item.link}" target="_blank">🔗 Baca selengkapnya</a>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        html += `</div>`;
+                        modalResult.innerHTML = html;
+                        modalResult.className = 'result-area show';
+                    } else {
+                        modalResult.innerHTML = '<p style="color:#f87171;">❌ Gagal mengambil berita.</p>';
+                        modalResult.className = 'result-area show';
+                    }
+                }
+            } catch (error) {
+                modalResult.innerHTML = `<p style="color:#f87171;">❌ Error: ${error.message}</p>`;
+                modalResult.className = 'result-area show';
+            } finally {
+                modalSpinner.className = 'loading-spinner';
+                modalProcessBtn.disabled = false;
+                modalProcessBtn.textContent = 'Proses';
+            }
+        }
+
+        // ============================================================
+        //  TEBAK GAMBAR CHECK
+        // ============================================================
+        async function checkTebakGambar() {
+            const jawaban = document.getElementById('tebakJawaban').value.trim();
+            if (!jawaban) {
+                alert('Masukkan jawaban!');
+                return;
+            }
+            if (jawaban.toLowerCase() === tebakGambarAnswer.toLowerCase()) {
+                await addPoin(5);
+                addMessage('🎉 Benar! +5 poin!', 'ai');
+                document.getElementById('tebakJawaban').value = '';
+                document.getElementById('tebakInputArea').style.display = 'none';
+                closeModal();
+            } else {
+                addMessage('❌ Salah. Coba lagi!', 'ai');
+                document.getElementById('tebakJawaban').value = '';
+            }
+        }
+
+        // ============================================================
+        //  DISPLAY RESULT
+        // ============================================================
+        function displayWeatherResult(data) {
+            const loc = data.location;
+            const cur = data.current;
+            const forecast = data.forecast || [];
+            let html = `
+                <div style="background:rgba(255,255,255,0.03);border-radius:14px;padding:14px 16px;">
+                    <div style="font-size:18px;font-weight:600;color:#f0f4fa;">${loc.countryFlag} ${loc.name}, ${loc.country}</div>
+                    <div style="font-size:34px;font-weight:700;margin:6px 0 2px;color:#f0f4fa;">${cur.temperature}</div>
+                    <div>${cur.conditionIcon} ${cur.condition}</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;font-size:14px;color:#9aa8c0;margin-top:12px;">
+                        <span>💧 Humidity <b>${cur.humidity}</b></span>
+                        <span>🌬️ Wind <b>${cur.wind.speed}</b></span>
+                        <span>🌡️ Feels like <b>${cur.feelsLike}</b></span>
+                        <span>☁️ Cloud <b>${cur.cloudiness}</b></span>
+                        <span>👁️ Visibility <b>${cur.visibility}</b></span>
+                        <span>🌍 AQI <b>${cur.aqi}</b></span>
+                    </div>
+                    <div style="display:flex;gap:12px;margin-top:16px;overflow-x:auto;padding-bottom:4px;">
+            `;
+            forecast.forEach(f => {
+                html += `
+                        <div style="background:rgba(255,255,255,0.04);padding:10px 16px;border-radius:14px;text-align:center;min-width:80px;">
+                            <div style="font-size:12px;color:#8892b0;">${f.date}</div>
+                            <div style="font-weight:600;font-size:16px;color:#f0f4fa;">${f.temp}</div>
+                            <div>${f.icon}</div>
+                            <div style="font-size:11px;color:#8892b0;">${f.condition}</div>
+                        </div>
+                    `;
+            });
+            html += `</div><div style="font-size:11px;color:#5a6a86;margin-top:12px;text-align:right;">🕐 ${cur.updatedAt}</div></div>`;
+            modalResult.innerHTML = html;
+            modalResult.className = 'result-area show';
+        }
+
+        function displayMatchResult(data) {
+            let html = `<div style="background:rgba(255,255,255,0.03);border-radius:14px;padding:12px 16px;">`;
+            data.result.forEach(m => {
+                html += `<div style="padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:14px;color:#d0d8e4;display:flex;align-items:center;gap:12px;">
+                            <span style="color:#a18cd1;font-weight:600;min-width:70px;">⚽</span> ${m}
+                        </div>`;
+            });
+            html += `</div>`;
+            modalResult.innerHTML = html;
+            modalResult.className = 'result-area show';
+        }
+
+        // ============================================================
+        //  SEND MESSAGE (AI Models)
+        // ============================================================
+        async function sendMessage() {
+            const text = userInput.value.trim();
+            if (!text || isWaiting || !currentUser) return;
+
+            const model = modelSelect.value;
+            const cost = model === 'Uncensored' ? 15 : 10;
+            const ok = await deductPoin(cost);
+            if (!ok) return;
+
+            addMessage(text, 'user');
+            userInput.value = '';
+            isWaiting = true;
+            sendBtn.disabled = true;
+            showLoading();
+
+            try {
+                let url;
+                let data;
+                if (model === 'Claude') {
+                    url = `https://api.blckrose.my.id/ai/claude?text=${encodeURIComponent(text)}&apikey=oeaqE`;
+                    const res = await fetch(url);
+                    data = await res.json();
+                    if (data.status === true) addMessage(data.result, 'ai');
+                    else addMessage('❌ Claude error.', 'ai');
+                } else if (model === 'Groq') {
+                    url = `https://api.blckrose.my.id/ai/groq?q=${encodeURIComponent(text)}&model=llama-3.1-8b-instant&apikey=oeaqE`;
+                    const res = await fetch(url);
+                    data = await res.json();
+                    if (data.status === true) addMessage(data.result, 'ai');
+                    else addMessage('❌ Groq error.', 'ai');
+                } else if (model === 'Copilot') {
+                    url = `https://api.blckrose.my.id/ai/copilot?text=${encodeURIComponent(text)}&model=gpt-5&apikey=oeaqE`;
+                    const res = await fetch(url);
+                    data = await res.json();
+                    if (data.status === true && data.result) {
+                        const answer = data.result.text || data.result;
+                        const citations = data.result.citations || [];
+                        addMessage(answer, 'ai', { citations });
+                    } else addMessage('❌ Copilot error.', 'ai');
+                } else if (model === 'Heck') {
+                    url = `https://api.blckrose.my.id/ai/heck?prompt=${encodeURIComponent(text)}&model=gpt-5.4-mini&apikey=oeaqE`;
+                    const res = await fetch(url);
+                    data = await res.json();
+                    if (data.status === true && data.result) {
+                        const answer = data.result.answer || data.result;
+                        const reason = data.result.reason || '';
+                        const sources = data.result.sources || [];
+                        addMessage(answer, 'ai', { reason, sources });
+                    } else addMessage('❌ Heck error.', 'ai');
+                } else if (model === 'Uncensored') {
+                    url = `https://api.blckrose.my.id/ai/uncensored?text=${encodeURIComponent(text)}&apikey=oeaqE`;
+                    const res = await fetch(url);
+                    data = await res.json();
+                    if (data.status === true) addMessage(data.result, 'ai');
+                    else addMessage('❌ Uncensored error.', 'ai');
+                } else if (model === 'Google') {
+                    url = `https://api.blckrose.my.id/ai/google?query=${encodeURIComponent(text)}&apikey=oeaqE`;
+                    const res = await fetch(url);
+                    data = await res.json();
+                    if (data.status === true) addMessage(data.result, 'ai');
+                    else addMessage('❌ Google error.', 'ai');
+                } else if (model === 'NoteGpt') {
+                    url = `https://api.blckrose.my.id/ai/notegpt?text=${encodeURIComponent(text)}&apikey=oeaqE`;
+                    const res = await fetch(url);
+                    data = await res.json();
+                    if (data.status === true) addMessage(data.result, 'ai');
+                    else addMessage('❌ NoteGpt error.', 'ai');
+                } else if (model === 'Xdash') {
+                    url = `https://api.blckrose.my.id/ai/xdash?text=${encodeURIComponent(text)}&apikey=oeaqE`;
+                    const res = await fetch(url);
+                    data = await res.json();
+                    if (data.status === true && data.result) {
+                        const answer = data.result.text || data.result;
+                        const sources = data.result.sources || [];
+                        addMessage(answer, 'ai', { sources });
+                    } else addMessage('❌ Xdash error.', 'ai');
+                } else {
+                    addMessage('❌ Model tidak dikenal.', 'ai');
+                }
+            } catch (error) {
+                addMessage('❌ Error jaringan: ' + error.message, 'ai');
+            } finally {
+                removeLoading();
+                isWaiting = false;
+                sendBtn.disabled = false;
+                chatArea.scrollTop = chatArea.scrollHeight;
+            }
+        }
+
+        // ============================================================
+        //  THEME TOGGLE
+        // ============================================================
+        function toggleTheme() {
+            const body = document.body;
+            const isDark = body.style.backgroundColor === 'radial-gradient(circle at top left, #0f0c29, #302b63, #24243e)';
+            if (isDark) {
+                body.style.background = '#f0f4fa';
+                body.style.color = '#1a2332';
+                document.querySelector('.app').style.background = 'rgba(255, 255, 255, 0.7)';
+            } else {
+                body.style.background = 'radial-gradient(circle at top left, #0f0c29, #302b63, #24243e)';
+                body.style.color = '#eef2f6';
+                document.querySelector('.app').style.background = 'rgba(20, 26, 36, 0.6)';
+            }
+        }
+
+        // ============================================================
+        //  TOGGLE SIDEBAR & LOGOUT
+        // ============================================================
+        function toggleMenu() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('overlay').classList.toggle('active');
+        }
+
+        function logout() {
+            localStorage.removeItem('abyyxai_uid');
+            localStorage.removeItem('abyyxai_email');
+            if (banListener) {
+                db.ref(`users/${currentUser?.uid}/banned`).off('value', banListener);
+            }
+            currentUser = null;
+            userData = null;
+            window.location.reload();
+        }
+    </script>
+</body>
+</html>
